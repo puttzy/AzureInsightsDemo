@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="debug"  >
+    <appenders>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="%m%n"/>
+        </Console>
+        <ApplicationInsightsAppender name="aiAppender"/>
+    </appenders>
+    <Loggers>
+       
+        <Root level="debug">
+            <AppenderRef ref="aiAppender" level="debug"/>
+            <AppenderRef ref="STDOUT" level="debug"/>
+        </Root>
+    </Loggers>
+</configuration>
