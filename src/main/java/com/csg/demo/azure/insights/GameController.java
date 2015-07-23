@@ -68,7 +68,7 @@ public class GameController {
             if (choices[x].equalsIgnoreCase(userChoice))
                 return x;
         }
-        return 0;
+        return -1;
     }
 
 	@RequestMapping(value="play/{choice}", method = RequestMethod.GET)
@@ -80,8 +80,19 @@ public class GameController {
         int randSelection = getRandomChoice();
         int userSelection = determineUserChoice(choice);
 
+        if (userSelection == -1 ){
+            model.addAttribute("exception", "Choice not valid");
+            return "error";
+        }
+
         String youchose = new String(choices[userSelection]);
         String ichose = new String(choices[randSelection]);
+
+        logger.debug("You chose" + youchose);
+
+
+
+
 
         TelemetryClient client = new TelemetryClient();
         MetricTelemetry mt = new MetricTelemetry();
@@ -114,7 +125,13 @@ public class GameController {
         Map<String, Double> metrics = new HashMap<String, Double>();
         metrics.put("userChoice", (double) userSelection);
         metrics.put("compChoice", (double) randSelection);
+
         client.trackEvent(outcome, properties, metrics);
+
+        client.trackEvent(outcome);
+        client.trackEvent(youchose);
+        client.trackEvent(ichose);
+        client.trackTrace("End of game" + outcome + ": " + youchose +" vs. " + ichose);
 
 
         client.flush();
@@ -125,7 +142,7 @@ public class GameController {
         model.addAttribute("ichose", ichose);
         model.addAttribute("record", record);
         model.addAttribute("curTime", String.format("%tR", new Date()));
-        logger.debug("Debug Line to session " + record);
+
 		return "play";
 	}
 
